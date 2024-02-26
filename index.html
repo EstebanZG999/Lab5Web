@@ -109,7 +109,7 @@
         ul.innerHTML = ""; // Limpia la lista antes de agregar los nuevos mensajes para evitar duplicados
         messages.forEach((message) => {
           const li = document.createElement('li');
-          li.classList.add('message-anim'); // Aplica la clase de animación si es necesario
+          li.classList.add('message-anim'); 
 
           // Detecta y procesa ambos, URLs de imágenes y enlaces web
           let processedMessage = message.message.replace(/(https?:\/\/\S+)/g, (url) => {
