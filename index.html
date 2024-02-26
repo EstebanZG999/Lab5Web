@@ -7,86 +7,89 @@
 </head>
 <body>
   <script type="application/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-      // Creación de elementos: ul para mensajes, textarea, botón de envío y de cambio de tema
-      const ul = document.createElement('ul');
-      document.body.append(ul);
+    document.addEventListener("DOMContentLoaded", function () {
+        // Crear elementos UI
+        const chatBox = document.createElement('div');
+        const ul = document.createElement('ul');
+        const t = document.createElement('textarea');
+        const b = document.createElement('button');
+        const themeToggle = document.createElement('button');
 
-      const t = document.createElement('textarea');
-      t.setAttribute('maxlength', '140');
-      document.body.append(t);
+        // Configuración inicial de estilos
+        document.body.style.fontFamily = 'Arial, sans-serif';
+        document.body.style.margin = '0';
+        document.body.style.display = 'flex';
+        document.body.style.flexDirection = 'column';
+        document.body.style.height = '100vh';
 
-      const charCount = document.createElement('div');
-      charCount.className = 'char-count';
-      document.body.append(charCount);
+        chatBox.style.flex = '1';
+        chatBox.style.display = 'flex';
+        chatBox.style.flexDirection = 'column-reverse';
+        chatBox.style.overflowY = 'scroll';
+        chatBox.style.margin = '10px';
 
-      const b = document.createElement('button');
-      b.className = 'send-button';
-      b.textContent = 'SEND';
-      document.body.append(b);
+        ul.style.listStyleType = 'none';
+        ul.style.padding = '0';
 
-      const themeToggle = document.createElement('button');
-      themeToggle.textContent = 'Toggle Theme';
-      document.body.append(themeToggle);
+        t.style.width = 'calc(100% - 20px)';
+        t.style.margin = '5px';
+        t.style.padding = '10px';
+        t.style.borderRadius = '5px';
+        t.style.border = '1px solid #ccc';
 
-      // Definición de estilos para temas claro y oscuro
-      const themes = {
-        light: {
-          body: { backgroundColor: '#ffffff', color: '#000000' },
-          ul: { backgroundColor: '#FFF', color: '#000' },
-          li: { backgroundColor: '#e7f3ff', color: '#000' },
-          textarea: { backgroundColor: '#ffffff', color: '#000000', borderColor: '#ccc' },
-          button: { backgroundColor: '#007bff', color: '#ffffff' },
-          charCount: { color: '#777' },
-          linkPreview: { color: '#007bff' }
-        },
-        dark: {
-          body: { backgroundColor: '#181818', color: '#ffffff' },
-          ul: { backgroundColor: '#242424', color: '#fff' },
-          li: { backgroundColor: '#323739', color: '#fff' },
-          textarea: { backgroundColor: '#333', color: '#ffffff', borderColor: '#444' },
-          button: { backgroundColor: '#0056b3', color: '#ffffff' },
-          charCount: { color: '#888' },
-          linkPreview: { color: '#9ecfff' }
+        b.textContent = 'Enviar';
+        b.style.margin = '5px';
+        b.style.padding = '10px';
+        b.style.borderRadius = '5px';
+        b.style.cursor = 'pointer';
+
+        themeToggle.textContent = 'Cambiar Tema';
+        themeToggle.style.margin = '5px';
+        themeToggle.style.padding = '10px';
+        themeToggle.style.borderRadius = '5px';
+        themeToggle.style.cursor = 'pointer';
+
+        // Agregar elementos al documento
+        chatBox.appendChild(ul);
+        document.body.appendChild(chatBox);
+        document.body.appendChild(t);
+        document.body.appendChild(b);
+        document.body.appendChild(themeToggle);
+
+        function applyStyles(theme) {
+            if (theme === 'dark') {
+                document.body.style.backgroundColor = '#1e1e1e';
+                document.body.style.color = '#ffffff';
+                t.style.backgroundColor = '#333333';
+                t.style.color = '#ffffff';
+                b.style.backgroundColor = '#4e5a65';
+                b.style.color = '#ffffff';
+                themeToggle.style.backgroundColor = '#4e5a65';
+                themeToggle.style.color = '#ffffff';
+            } else {
+                document.body.style.backgroundColor = '#f0f0f0';
+                document.body.style.color = '#000000';
+                t.style.backgroundColor = '#ffffff';
+                t.style.color = '#000000';
+                b.style.backgroundColor = '#ddeeff';
+                b.style.color = '#000000';
+                themeToggle.style.backgroundColor = '#ddeeff';
+                themeToggle.style.color = '#000000';
+            }
         }
-      };
 
-      // Función para aplicar estilos según el tema
-      function applyStyles(theme) {
-        const style = themes[theme];
-        Object.assign(document.body.style, style.body);
-        Object.assign(ul.style, style.ul);
-        Object.assign(t.style, {
-          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
-          bottom: '50px', width: 'calc(80% - 20px)', height: '40px',
-          resize: 'none', borderRadius: '15px', outline: 'none', padding: '10px',
-          ...style.textarea
-        });
-        Object.assign(b.style, {
-          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
-          bottom: '15px', cursor: 'pointer', borderRadius: '15px',
-          padding: '10px 20px', ...style.button
-        });
-        Object.assign(charCount.style, {
-          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
-          bottom: '95px', ...style.charCount
-        });
-        // Estilos adicionales y eventos aquí...
-      }
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyStyles(newTheme);
+        }
 
-      // Cambio de tema y almacenamiento en localStorage
-      const toggleTheme = () => {
-        const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        localStorage.setItem('theme', newTheme);
-        applyStyles(newTheme);
-      };
+        // Inicializar tema
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyStyles(savedTheme);
 
-      // Aplicar tema al cargar
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      applyStyles(savedTheme);
-
-      themeToggle.addEventListener('click', toggleTheme);
+        themeToggle.addEventListener('click', toggleTheme);
 
       const getMessages = async () => {
         const response = await fetch('https://chat.tiburoncin.lat/messages');
