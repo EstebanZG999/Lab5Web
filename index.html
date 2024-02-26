@@ -14,6 +14,9 @@
         const t = document.createElement('textarea');
         const b = document.createElement('button');
         const themeToggle = document.createElement('button');
+        const charCount = document.createElement('div');
+
+        t.maxLength = 140;
 
         // Configuración inicial de estilos
         document.body.style.fontFamily = 'Arial, sans-serif';
@@ -55,6 +58,7 @@
         document.body.appendChild(t);
         document.body.appendChild(b);
         document.body.appendChild(themeToggle);
+        document.body.appendChild(charCount);
 
         function applyStyles(theme) {
             if (theme === 'dark') {
@@ -84,6 +88,10 @@
             localStorage.setItem('theme', newTheme);
             applyStyles(newTheme);
         }
+
+        t.addEventListener('input', function () {
+            charCount.textContent = `${t.value.length} / 140`;
+        });
 
         // Inicializar tema
         const savedTheme = localStorage.getItem('theme') || 'light';
