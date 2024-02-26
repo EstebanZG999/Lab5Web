@@ -8,106 +8,85 @@
 <body>
   <script type="application/javascript">
     document.addEventListener("DOMContentLoaded", function() {
-      // Estilos básicos para body y html
-      document.body.style.height = '100%';
-      document.body.style.margin = '0';
-      document.body.style.fontFamily = "'Arial', sans-serif";
-      document.body.style.fontSize = '14px';
-      document.body.style.transition = 'background-color 0.3s ease';
-
+      // Creación de elementos: ul para mensajes, textarea, botón de envío y de cambio de tema
       const ul = document.createElement('ul');
-      // Estilos para el contenedor de mensajes
-      ul.style.listStyleType = 'none';
-      ul.style.padding = '20px';
-      ul.style.margin = '0';
-      ul.style.overflowY = 'scroll';
-      ul.style.background = '#FFF';
-      ul.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-      ul.style.borderRadius = '8px';
-      ul.style.position = 'fixed';
-      ul.style.top = '50px';
-      ul.style.bottom = '120px';
-      ul.style.left = '0';
-      ul.style.right = '0';
       document.body.append(ul);
 
       const t = document.createElement('textarea');
       t.setAttribute('maxlength', '140');
-      // Estilos para textarea
-      t.style.position = 'fixed';
-      t.style.left = '50%';
-      t.style.transform = 'translateX(-50%)';
-      t.style.border = 'none';
-      t.style.padding = '8px';
-      t.style.borderRadius = '15px';
-      t.style.outline = 'none';
-      t.style.fontSize = '14px';
-      t.style.bottom = '50px';
-      t.style.width = 'calc(80% - 20px)';
-      t.style.height = '40px';
-      t.style.resize = 'none';
-      t.style.paddingRight = '10px';
       document.body.append(t);
 
-      // Elemento para mostrar el conteo de caracteres
       const charCount = document.createElement('div');
-      charCount.style.position = 'fixed';
-      charCount.style.left = '50%';
-      charCount.style.transform = 'translateX(-50%)';
-      charCount.style.bottom = '95px';
-      charCount.style.color = '#777';
-      charCount.innerHTML = '0 / 140';
+      charCount.className = 'char-count';
       document.body.append(charCount);
 
       const b = document.createElement('button');
-      // Estilos para el botón de enviar
-      b.style.position = 'fixed';
-      b.style.left = '50%';
-      b.style.transform = 'translateX(-50%)';
-      b.style.bottom = '15px';
-      b.style.backgroundColor = '#007bff';
-      b.style.color = 'white';
-      b.style.cursor = 'pointer';
-      b.style.padding = '6px 12px';
-      b.style.border = 'none';
-      b.style.borderRadius = '15px';
-      b.append('SEND');
+      b.className = 'send-button';
+      b.textContent = 'SEND';
       document.body.append(b);
 
-      // Botón para cambiar el tema
       const themeToggle = document.createElement('button');
-      themeToggle.innerHTML = 'Toggle Theme';
-      // Estilos para el botón de cambio de tema
-      themeToggle.style.position = 'fixed';
-      themeToggle.style.top = '10px';
-      themeToggle.style.right = '10px';
-      themeToggle.style.background = '#007bff';
-      themeToggle.style.color = '#ffffff';
-      themeToggle.style.border = 'none';
-      themeToggle.style.borderRadius = '5px';
-      themeToggle.style.padding = '5px 10px';
-      themeToggle.style.cursor = 'pointer';
+      themeToggle.textContent = 'Toggle Theme';
       document.body.append(themeToggle);
 
+      // Definición de estilos para temas claro y oscuro
+      const themes = {
+        light: {
+          body: { backgroundColor: '#ffffff', color: '#000000' },
+          ul: { backgroundColor: '#FFF', color: '#000' },
+          li: { backgroundColor: '#e7f3ff', color: '#000' },
+          textarea: { backgroundColor: '#ffffff', color: '#000000', borderColor: '#ccc' },
+          button: { backgroundColor: '#007bff', color: '#ffffff' },
+          charCount: { color: '#777' },
+          linkPreview: { color: '#007bff' }
+        },
+        dark: {
+          body: { backgroundColor: '#181818', color: '#ffffff' },
+          ul: { backgroundColor: '#242424', color: '#fff' },
+          li: { backgroundColor: '#323739', color: '#fff' },
+          textarea: { backgroundColor: '#333', color: '#ffffff', borderColor: '#444' },
+          button: { backgroundColor: '#0056b3', color: '#ffffff' },
+          charCount: { color: '#888' },
+          linkPreview: { color: '#9ecfff' }
+        }
+      };
 
-      // Función para cambiar el tema y guardar la preferencia
+      // Función para aplicar estilos según el tema
+      function applyStyles(theme) {
+        const style = themes[theme];
+        Object.assign(document.body.style, style.body);
+        Object.assign(ul.style, style.ul);
+        Object.assign(t.style, {
+          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
+          bottom: '50px', width: 'calc(80% - 20px)', height: '40px',
+          resize: 'none', borderRadius: '15px', outline: 'none', padding: '10px',
+          ...style.textarea
+        });
+        Object.assign(b.style, {
+          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
+          bottom: '15px', cursor: 'pointer', borderRadius: '15px',
+          padding: '10px 20px', ...style.button
+        });
+        Object.assign(charCount.style, {
+          position: 'fixed', left: '50%', transform: 'translateX(-50%)',
+          bottom: '95px', ...style.charCount
+        });
+        // Estilos adicionales y eventos aquí...
+      }
+
+      // Cambio de tema y almacenamiento en localStorage
       const toggleTheme = () => {
         const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        document.body.className = newTheme === 'light' ? 'light-theme' : 'dark-theme';
         localStorage.setItem('theme', newTheme);
+        applyStyles(newTheme);
       };
 
-      // Aplicar el tema guardado o el tema claro por defecto
-      const applySavedTheme = () => {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.body.className = savedTheme === 'light' ? 'light-theme' : 'dark-theme';
-      };
+      // Aplicar tema al cargar
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      applyStyles(savedTheme);
 
       themeToggle.addEventListener('click', toggleTheme);
-
-      // Llamada inicial para aplicar el tema
-      applySavedTheme();
 
       const getMessages = async () => {
         const response = await fetch('https://chat.tiburoncin.lat/messages');
