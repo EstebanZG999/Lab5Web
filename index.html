@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat No GPT</title>
+</head>
+<body>
+  <script type="application/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      // Estilos básicos para body y html
+      document.body.style.height = '100%';
+      document.body.style.margin = '0';
+      document.body.style.fontFamily = "'Arial', sans-serif";
+      document.body.style.fontSize = '14px';
+      document.body.style.transition = 'background-color 0.3s ease';
+
+      const ul = document.createElement('ul');
+      // Estilos para el contenedor de mensajes
+      ul.style.listStyleType = 'none';
+      ul.style.padding = '20px';
+      ul.style.margin = '0';
+      ul.style.overflowY = 'scroll';
+      ul.style.background = '#FFF';
+      ul.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+      ul.style.borderRadius = '8px';
+      ul.style.position = 'fixed';
+      ul.style.top = '50px';
+      ul.style.bottom = '120px';
+      ul.style.left = '0';
+      ul.style.right = '0';
+      document.body.append(ul);
+
+      const t = document.createElement('textarea');
+      t.setAttribute('maxlength', '140');
+      // Estilos para textarea
+      t.style.position = 'fixed';
+      t.style.left = '50%';
+      t.style.transform = 'translateX(-50%)';
+      t.style.border = 'none';
+      t.style.padding = '8px';
+      t.style.borderRadius = '15px';
+      t.style.outline = 'none';
+      t.style.fontSize = '14px';
+      t.style.bottom = '50px';
+      t.style.width = 'calc(80% - 20px)';
+      t.style.height = '40px';
+      t.style.resize = 'none';
+      t.style.paddingRight = '10px';
+      document.body.append(t);
+
+      // Elemento para mostrar el conteo de caracteres
+      const charCount = document.createElement('div');
+      charCount.style.position = 'fixed';
+      charCount.style.left = '50%';
+      charCount.style.transform = 'translateX(-50%)';
+      charCount.style.bottom = '95px';
+      charCount.style.color = '#777';
+      charCount.innerHTML = '0 / 140';
+      document.body.append(charCount);
+
+      const b = document.createElement('button');
+      // Estilos para el botón de enviar
+      b.style.position = 'fixed';
+      b.style.left = '50%';
+      b.style.transform = 'translateX(-50%)';
+      b.style.bottom = '15px';
+      b.style.backgroundColor = '#007bff';
+      b.style.color = 'white';
+      b.style.cursor = 'pointer';
+      b.style.padding = '6px 12px';
+      b.style.border = 'none';
+      b.style.borderRadius = '15px';
+      b.append('SEND');
+      document.body.append(b);
+
+      // Botón para cambiar el tema
+      const themeToggle = document.createElement('button');
+      themeToggle.innerHTML = 'Toggle Theme';
+      // Estilos para el botón de cambio de tema
+      themeToggle.style.position = 'fixed';
+      themeToggle.style.top = '10px';
+      themeToggle.style.right = '10px';
+      themeToggle.style.background = '#007bff';
+      themeToggle.style.color = '#ffffff';
+      themeToggle.style.border = 'none';
+      themeToggle.style.borderRadius = '5px';
+      themeToggle.style.padding = '5px 10px';
+      themeToggle.style.cursor = 'pointer';
+      document.body.append(themeToggle);
+
+
+      // Función para cambiar el tema y guardar la preferencia
+      const toggleTheme = () => {
+        const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.body.className = newTheme === 'light' ? 'light-theme' : 'dark-theme';
+        localStorage.setItem('theme', newTheme);
+      };
+
+      // Aplicar el tema guardado o el tema claro por defecto
+      const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.className = savedTheme === 'light' ? 'light-theme' : 'dark-theme';
+      };
+
+      themeToggle.addEventListener('click', toggleTheme);
+
+      // Llamada inicial para aplicar el tema
+      applySavedTheme();
+
+      const getMessages = async () => {
+        const response = await fetch('https://chat.tiburoncin.lat/messages');
+        const messages = await response.json().then(data => data.reverse());
+
+        // Guarda la posición actual del scroll antes de actualizar los mensajes
+        const atBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
+        
+        ul.innerHTML = ""; // Limpia la lista antes de agregar los nuevos mensajes para evitar duplicados
+        messages.forEach((message) => {
+          const li = document.createElement('li');
+          li.classList.add('message-anim'); // Aplica la clase de animación si es necesario
+
+          // Detecta y procesa ambos, URLs de imágenes y enlaces web
+          let processedMessage = message.message.replace(/(https?:\/\/\S+)/g, (url) => {
+            // Si es una imagen, retorna un elemento img
+            if (url.match(/\.(jpg|jpeg|png|gif)$/)) {
+              return `<img src="${url}" style="max-width: 200px; max-height: 200px;">`;
+            } else {
+              // Para otros enlaces, muestra el dominio como texto clickeable
+              const domain = new URL(url).hostname;
+              return `<a href="${url}" target="_blank" class="link-preview">${domain}</a>`;
+            }
+          });
+
+          // Configura el contenido del mensaje, permitiendo HTML
+          li.innerHTML = `${message.username}: ${processedMessage}`;
+          ul.appendChild(li);
+        });
+        
+        // Ajusta el scroll si el usuario estaba al final
+        if (atBottom) {
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      };
+
+
+      setInterval(getMessages, 5000);
+
+
+    const postMessage = async () => {
+      console.log(t.value);
+      const body = {
+        username: 'Esteban Z',
+        message: t.value,
+      };
+
+      // Evita limpiar inmediatamente para no perder la posición del scroll
+      const response = await fetch('https://chat.tiburoncin.lat/messages', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+
+      // Recarga los mensajes sin limpiar previamente la lista
+      await getMessages();
+
+      // Verifica si el usuario está al final antes de enviar el mensaje
+      const atBottomBeforeSending = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1;
+
+      if (atBottomBeforeSending) {
+        // Asegura que el scroll se ajuste solo después de que la lista se haya actualizado
+        setTimeout(() => {
+          window.scrollTo(0, document.body.scrollHeight);
+        }, 100); // Pequeña demora para asegurar que el DOM se haya actualizado
+      }
+
+      t.value = ''; // Limpia el campo de texto después de enviar
+      charCount.innerHTML = '0 / 140'; // Restablece el contador de caracteres
+    };
+
+
+      // Evento para enviar el mensaje con Enter y permitir saltos de línea con Shift+Enter
+      t.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault(); // Previene el salto de línea
+          postMessage(); // Llama a la función para enviar el mensaje
+        }
+      });
+
+      // Actualiza el contador de caracteres
+      t.addEventListener('input', function() {
+        charCount.innerHTML = `${t.value.length} / 140`;
+      });
+
+      b.addEventListener('click', postMessage);
+
+      getMessages();
+    });
+  </script>
+</body>
+</html>
